@@ -7,17 +7,24 @@ use App\Repository\CustomerRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
  * @ApiResource(
  *  normalizationContext={
  *      "groups"={"customers_read"}
- *  } 
+ *  },
+ *  collectionOperations={"GET","POST"},
+ *  itemOperations={"GET","PUT","DELETE","PATCH"},
+ *  subresourceOperations={
+ *      "invoices_get_subresource"={"path"="/customers/{id}/invoices"}
+ *  }
  * )
  * @ApiFilter(SearchFilter::class, properties={"firstName":"partial","lastName","company"})
  * @ApiFilter(OrderFilter::class)
@@ -35,18 +42,24 @@ class Customer
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read","invoices_read","users_read"})
+     * @Assert\NotBlank(message="Le prénom du customer est obligatoire")
+     * @Assert\Length(min=3,minMessage="Le prénom doit faire entre 2 et 255 caractéres",max=255,maxMessage="Le prénom doit faire entre 2 et 255 caractéres")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read","invoices_read","users_read"})
+     * @Assert\NotBlank(message="Le Nom du customer est obligatoire")
+     * @Assert\Length(min=3,minMessage="Le Nom doit faire entre 2 et 255 caractéres",max=255,maxMessage="Le Nom doit faire entre 2 et 255 caractéres")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read","invoices_read","users_read"})
+     * @Assert\NotBlank(message="L'adresse e-mail du customer est obligatoire")
+     * @Assert\Email(message="Le format de l'e-mail doit être valide")
      */
     private $email;
 
@@ -59,12 +72,14 @@ class Customer
     /**
      * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="customer")
      * @Groups({"customers_read","users_read"})
+     * @ApiSubresource
      */
     private $invoices;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
      * @Groups({"customers_read"})
+     * @Assert\NotBlank(message="L'utilisateur est obligatoire")
      */
     private $user;
 
