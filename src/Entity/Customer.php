@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -43,15 +44,15 @@ class Customer
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read","invoices_read","users_read"})
      * @Assert\NotBlank(message="Le prénom du customer est obligatoire")
-     * @Assert\Length(min=3,minMessage="Le prénom doit faire entre 2 et 255 caractéres",max=255,maxMessage="Le prénom doit faire entre 2 et 255 caractéres")
+     * @Assert\Length(min=2, minMessage="Le prénom doit faire entre 2 et 255 caractères", max=255, maxMessage="Le prénom doit faire entre 2 et 255 caractères")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read","invoices_read","users_read"})
-     * @Assert\NotBlank(message="Le Nom du customer est obligatoire")
-     * @Assert\Length(min=3,minMessage="Le Nom doit faire entre 2 et 255 caractéres",max=255,maxMessage="Le Nom doit faire entre 2 et 255 caractéres")
+     * @Assert\NotBlank(message="Le nom du customer est obligatoire")
+     * @Assert\Length(min=2, minMessage="Le nom doit faire entre 2 et 255 caractères", max=255, maxMessage="Le nom doit faire entre 2 et 255 caractères")
      */
     private $lastName;
 
@@ -59,7 +60,7 @@ class Customer
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read","invoices_read","users_read"})
      * @Assert\NotBlank(message="L'adresse e-mail du customer est obligatoire")
-     * @Assert\Email(message="Le format de l'e-mail doit être valide")
+     * @Assert\Email(message="Le format de l'adresse email doit être valide")
      */
     private $email;
 
@@ -79,7 +80,7 @@ class Customer
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
      * @Groups({"customers_read"})
-     * @Assert\NotBlank(message="L'utilisateur est obligatoire")
+     * @Assert\NotBlank(message="l'utilisateur est obligatoire")
      */
     private $user;
 
@@ -94,7 +95,7 @@ class Customer
     }
 
     /**
-     * Permet de recup le total des invoices
+     * Permet de récupérer le total des invoices
      * @Groups({"customers_read"})
      *
      * @return float
@@ -107,15 +108,14 @@ class Customer
     }
 
     /**
-     * Permet de recup le total des invoices non payé 
+     * Permet de récupérer le montant total non payé des factures
      * @Groups({"customers_read"})
-     *
      * @return float
      */
     public function getUnpaidAmount(): float
     {
-        return array_reduce($this->invoices->toArray(), function($total,$invoice){
-            return $total + ($invoice->getStatus()=== "PAID" || $invoice->getStatus()=== "CANCELLED" ? 0 : $invoice->getAmount());
+        return array_reduce($this->invoices->toArray(),function($total,$invoice){
+            return $total + ($invoice->getStatus() === "PAID" || $invoice->getStatus() === "CANCELLED" ? 0 : $invoice->getAmount());
         },0);
     }
 

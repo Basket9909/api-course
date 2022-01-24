@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * @ApiResource(
  *  normalizationContext={"groups"={"users_read"}}
  * )
- * @ApiFilter(SearchFilter::class, properties={"customers.firstname":"partial"})
+ * @ApiFilter(SearchFilter::class, properties={"customers.firstName":"partial"})
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
